@@ -17,6 +17,7 @@ embedding_model = HuggingFaceEmbeddings(
 
 
 db = Chroma(
+    collection_name="rag_documents_v2",
     persist_directory=persistent_directory,
     embedding_function=embedding_model,
     collection_metadata={"hnsw:space": "cosine"}  
