@@ -22,9 +22,9 @@ db = Chroma(
     collection_metadata={"hnsw:space": "cosine"}  
 )
 
-query = "is c++ a high level lenguage"
+query = "What is C++"
 
-retriever = db.as_retriever(search_kwargs={"k": 5})
+retriever = db.as_retriever(search_kwargs={"k": 2})
 
 
 # retriever = db.as_retriever(
@@ -47,7 +47,7 @@ for i, doc in enumerate(relevant_docs, 1):
     
     
 # Combine the query and the relevant document contents
-combined_input = f"""Based on the following documents, please answer this question: {query}
+combined_input = f"""Based on the following documents, Ans-> \n \n: {query}
 
 Documents:
 {chr(10).join([f"- {doc.page_content}" for doc in relevant_docs])}
