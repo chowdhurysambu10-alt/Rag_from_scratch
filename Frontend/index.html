@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>RAG Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="chat-container">
+        <header>
+            <h2>RAG Assistant</h2>
+            <button id="new-chat">New Chat</button>
+        </header>
+
+        <div id="chat-box"></div>
+
+        <form id="chat-form">
+            <input
+                id="question"
+                placeholder="Ask about your documents..."
+                autocomplete="off"
+                required
+            >
+            <button type="submit">Send</button>
+        </form>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

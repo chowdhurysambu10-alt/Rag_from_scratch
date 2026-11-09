@@ -15,9 +15,10 @@ sys.path.insert(0, str(ROOT))
 # Step 2: Import RAG functions
 from history_aware_generation import (
     create_session,
-    ask_question
+    ask_question,
+    retriever,
+    model
 )
-
 # Step 3: Create FastAPI application
 app = FastAPI(title="My RAG Chatbot")
 
@@ -67,8 +68,10 @@ def chat(request: ChatRequest):
     try:
         result = ask_question(
             request.question,
-            request.session_id
-        )
+            request.session_id,
+            retriever,
+            model
+)
         return result
 
     except ValueError as error:
