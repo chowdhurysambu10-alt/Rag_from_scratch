@@ -1,5 +1,3 @@
-"""Terminal-based, history-aware RAG chat with session isolation and streaming."""
-
 import os
 import time
 from pathlib import Path
@@ -12,10 +10,11 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_huggingface import HuggingFaceEmbeddings
 
-load_dotenv()
+ROOT = Path(__file__).resolve().parent
+load_dotenv(ROOT / ".env")
 
 # Keep these settings aligned with your ingestion pipeline.
-PERSIST_DIRECTORY = os.getenv("CHROMA_DIRECTORY", "db/chroma_local")
+PERSIST_DIRECTORY = str(ROOT / os.getenv("CHROMA_DIRECTORY", "db/chroma_local"))
 COLLECTION_NAME = os.getenv("CHROMA_COLLECTION", "rag_documents_v2")
 EMBEDDING_MODEL = os.getenv(
     "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"

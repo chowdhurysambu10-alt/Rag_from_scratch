@@ -20,18 +20,46 @@ function addMessage(text, role) {
     return element;
 }
 
+
 async function createSession() {
-    const response = await fetch(`${API}/session`, {
-        method: "POST"
-    });
+    const url = `${API}/session`;
 
-    if (!response.ok) {
-        throw new Error("Could not create session");
+    console.log("Creating session:", url);
+
+    try {
+        const response = await fetch(url, {
+            method: "POST"
+        });
+
+        const body = await response.text();
+
+        console.log("Session status:", response.status);
+        console.log("Session response:", body);
+
+        if (!response.ok) {
+            throw new Error(
+                `Session failed (${response.status}): ${body}`
+            );
+        }
+
+        const data = JSON.parse(body);
+
+        if (!data.session_id) {
+            throw new Error("Missing session_id in response");
+        }
+
+        sessionId = data.session_id;
+
+        console.log("Session created:", sessionId);
+
+        return sessionId;
+
+    } catch (error) {
+        console.error("Session creation error:", error);
+        throw error;
     }
-
-    const data = await response.json();
-    sessionId = data.session_id;
 }
+
 
 chatForm.addEventListener("submit", async (event) => {
     event.preventDefault();
