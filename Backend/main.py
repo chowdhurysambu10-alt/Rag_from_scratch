@@ -7,7 +7,6 @@ from pydantic import BaseModel
 
 app = FastAPI(title="My RAG Chatbot")
 
-
 # Step 1: Locate our existing RAG code
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -35,7 +34,7 @@ app.add_middleware(
     allow_headers=["Content-Type"]
 )
 
-# Step 5: Define question structure
+# Step 5: Define question structure 
 class ChatRequest(BaseModel):
     question: str
     session_id: str
@@ -53,8 +52,8 @@ def new_session():
     return {
         "session_id": create_session()
     }
-
-
+    
+    
 # Step 8: Ask the RAG chatbot
 @app.post("/chat")
 def chat(request: ChatRequest):
