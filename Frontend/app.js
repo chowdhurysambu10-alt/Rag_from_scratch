@@ -1,5 +1,19 @@
+const API = "http://127.0.0.1:8000/".replace(/\/+$/, "");
 
-const API = "http://127.0.0.1:8000";
+async function createSession() {
+    const response = await fetch(`${API}/session`, {
+        method: "POST"
+    });
+
+    if (!response.ok) {
+        throw new Error(`Session failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    sessionId = data.session_id;
+
+    return sessionId;
+}
 
 const chatBox = document.getElementById("chat-box");
 const chatForm = document.getElementById("chat-form");
@@ -113,8 +127,8 @@ chatForm.addEventListener("submit", async (event) => {
                     const location = s.slide
                         ? `Slide ${s.slide}`
                         : s.page
-                        ? `Page ${s.page}`
-                        : "";
+                            ? `Page ${s.page}`
+                            : "";
 
                     return `${s.reference} ${s.file} ${location}`;
                 }).join(", ");

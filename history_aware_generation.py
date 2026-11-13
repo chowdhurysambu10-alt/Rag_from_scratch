@@ -248,6 +248,5 @@ def start_chat():
         except Exception as exc:
             print(f"Error: {exc}")
 
-
 if __name__ == "__main__":
     start_chat()
