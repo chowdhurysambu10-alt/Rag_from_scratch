@@ -30,22 +30,6 @@ app.include_router(
     tags=["Documents"]
 )
 
-
-@app.get("/")
-def home():
-    return {
-        "message": "RAG Backend is running",
-        "status": "active"
-    }
-
-
-
-
-
-
-
-
-
 # Step 1: Locate existing RAG code and database directory
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
