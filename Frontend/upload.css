@@ -1,0 +1,357 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #101114;
+    color: #f5f5f5;
+}
+
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+
+/* Sidebar */
+
+.sidebar {
+    width: 250px;
+    background: #17181d;
+    border-right: 1px solid #292a30;
+    padding: 28px 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.brand {
+    font-size: 22px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 45px;
+}
+
+.brand-icon {
+    color: #a78bfa;
+    font-size: 28px;
+}
+
+.navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #a1a1aa;
+    padding: 13px 14px;
+    border-radius: 9px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: #292635;
+    color: #c4b5fd;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    font-size: 12px;
+    color: #a1a1aa;
+}
+
+.sidebar-footer span {
+    color: #22c55e;
+}
+
+/* Main */
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.topbar {
+    height: 85px;
+    border-bottom: 1px solid #292a30;
+    padding: 0 45px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.topbar h2 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.topbar p {
+    font-size: 12px;
+    color: #92929c;
+}
+
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    background: #383047;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #d8b4fe;
+}
+
+/* Upload section */
+
+.upload-section {
+    max-width: 850px;
+    margin: 55px auto;
+    padding: 0 25px;
+}
+
+.page-heading {
+    margin-bottom: 35px;
+}
+
+.page-heading h1 {
+    font-size: 29px;
+    margin-bottom: 10px;
+}
+
+.page-heading p {
+    color: #92929c;
+    font-size: 14px;
+}
+
+/* Drop Zone */
+
+.upload-box {
+    border: 2px dashed #45404f;
+    border-radius: 15px;
+    background: #18191f;
+    padding: 55px 20px;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.upload-box.drag-over {
+    border-color: #a78bfa;
+    background: #24202f;
+}
+
+.upload-icon {
+    width: 58px;
+    height: 58px;
+    background: #30283f;
+    color: #c4b5fd;
+    font-size: 35px;
+    border-radius: 15px;
+    margin: 0 auto 20px;
+    display: grid;
+    place-items: center;
+}
+
+.upload-box h3 {
+    font-size: 17px;
+    margin-bottom: 9px;
+}
+
+.upload-box p {
+    color: #92929c;
+    font-size: 13px;
+    margin-bottom: 22px;
+}
+
+.browse-btn {
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.browse-btn:hover {
+    background: #7c3aed;
+}
+
+.file-info {
+    display: block;
+    margin-top: 18px;
+    color: #777783;
+    font-size: 11px;
+}
+
+/* File card */
+
+.file-card {
+    margin-top: 20px;
+    padding: 17px;
+    border: 1px solid #34343d;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #191a20;
+}
+
+.file-card[hidden] {
+    display: none;
+}
+
+.file-icon {
+    background: #442629;
+    color: #fca5a5;
+    padding: 12px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.file-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-details h4 {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.file-details p {
+    color: #92929c;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.remove-btn {
+    background: transparent;
+    border: none;
+    color: #f87171;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* Upload button */
+
+.upload-btn {
+    width: 100%;
+    margin-top: 22px;
+    padding: 15px;
+    border: none;
+    border-radius: 9px;
+    background: #8b5cf6;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.upload-btn:disabled {
+    background: #38343f;
+    color: #77717f;
+    cursor: not-allowed;
+}
+
+.status-message {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #a78bfa;
+}
+
+/* Information card */
+
+.info-card {
+    background: #191a20;
+    border: 1px solid #303039;
+    border-radius: 12px;
+    padding: 25px;
+    margin-top: 40px;
+}
+
+.info-card h3 {
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.step {
+    display: flex;
+    gap: 14px;
+}
+
+.step>span {
+    color: #a78bfa;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.step h4 {
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.step p {
+    font-size: 11px;
+    color: #92929c;
+    line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        width: 65px;
+        padding: 20px 8px;
+    }
+
+    .brand {
+        font-size: 0;
+        justify-content: center;
+    }
+
+    .nav-link {
+        font-size: 0;
+        justify-content: center;
+        padding: 14px 5px;
+    }
+
+    .nav-link span {
+        font-size: 18px;
+    }
+
+    .sidebar-footer {
+        font-size: 0;
+    }
+
+    .topbar {
+        padding: 0 18px;
+    }
+
+    .upload-section {
+        margin-top: 35px;
+    }
+
+    .steps {
+        grid-template-columns: 1fr;
+    }
+
+    .page-heading h1 {
+        font-size: 23px;
+    }
+}

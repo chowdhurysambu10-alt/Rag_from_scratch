@@ -7,6 +7,45 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from Backend.api.upload import router as upload_router
+
+# Frontend connection
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5500"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"]
+)
+
+# Register upload API
+app.include_router(
+    upload_router,
+    prefix="/api",
+    tags=["Documents"]
+)
+
+
+@app.get("/")
+def home():
+    return {
+        "message": "RAG Backend is running",
+        "status": "active"
+    }
+
+
+
+
+
+
+
+
+
 # Step 1: Locate existing RAG code and database directory
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -25,7 +64,15 @@ async def lifespan(app: FastAPI):
     yield
 
 # Step 3: Create FastAPI application
-app = FastAPI(title="My RAG Chatbot", lifespan=lifespan)
+app = FastAPI(
+    title="RAG Application API",
+    description="Document Upload and RAG Backend",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+
+
 
 # Step 4: Allow frontend to communicate (CORS)
 app.add_middleware(

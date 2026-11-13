@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Documents | RAG AI</title>
+    <link rel="stylesheet" href="upload.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">✦</span>
+                <span>RAG AI</span>
+            </div>
+
+            <nav class="navigation">
+                <a href="index.html" class="nav-link">
+                    <span>💬</span> Chat
+                </a>
+
+                <a href="upload.html" class="nav-link active">
+                    <span>📁</span> Upload Documents
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <span>●</span> Local Workspace
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <header class="topbar">
+                <div>
+                    <h2>Upload Documents</h2>
+                    <p>Add documents to your personal knowledge base.</p>
+                </div>
+                <div class="user-avatar">U</div>
+            </header>
+
+            <section class="upload-section">
+
+                <div class="page-heading">
+                    <h1>Build your knowledge base</h1>
+                    <p>
+                        Upload your documents and let AI understand
+                        their content.
+                    </p>
+                </div>
+
+                <!-- Upload Box -->
+                <div class="upload-box" id="dropZone">
+
+                    <div class="upload-icon">↑</div>
+
+                    <h3>Drag and drop your PDF here</h3>
+
+                    <p>or select a file from your device</p>
+
+                    <input type="file" id="fileInput" accept=".pdf,application/pdf" hidden>
+
+                    <button class="browse-btn" id="browseBtn">
+                        Browse Files
+                    </button>
+
+                    <span class="file-info">
+                        Supported format: PDF
+                    </span>
+                </div>
+
+                <!-- Selected File -->
+                <div class="file-card" id="fileCard" hidden>
+
+                    <div class="file-icon">PDF</div>
+
+                    <div class="file-details">
+                        <h4 id="fileName">document.pdf</h4>
+                        <p id="fileSize">0 MB</p>
+                    </div>
+
+                    <button id="removeBtn" class="remove-btn" aria-label="Remove selected file">
+                        ✕
+                    </button>
+                </div>
+
+                <!-- Upload Button -->
+                <button class="upload-btn" id="uploadBtn" disabled>
+                    Upload Document →
+                </button>
+
+                <p class="status-message" id="statusMessage" aria-live="polite"></p>
+
+                <!-- Information -->
+                <div class="info-card">
+                    <h3>What happens after uploading?</h3>
+
+                    <div class="steps">
+                        <div class="step">
+                            <span>01</span>
+                            <div>
+                                <h4>Document Processing</h4>
+                                <p>Extract text from your PDF.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <span>02</span>
+                            <div>
+                                <h4>Text Chunking</h4>
+                                <p>Split the document into smaller chunks.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <span>03</span>
+                            <div>
+                                <h4>Embedding Generation</h4>
+                                <p>Convert chunks into vector embeddings.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <span>04</span>
+                            <div>
+                                <h4>Vector Storage</h4>
+                                <p>Store embeddings in ChromaDB.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <script src="upload.js"></script>
+</body>
+
+</html>
