@@ -82,8 +82,11 @@ def split_documents(documents):
     # Print first 2 chunks
     for i, chunk in enumerate(chunks[:2]):
         print(f"\nChunk {i+1}:")
+        
         print(f"Source: {chunk.metadata.get('source')}")
+        
         print(f"Length: {len(chunk.page_content)}")
+        
         print(f"Preview: {chunk.page_content[:100]}...")
 
     # Validate token count

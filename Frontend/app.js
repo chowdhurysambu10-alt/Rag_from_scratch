@@ -20,12 +20,13 @@ const chatForm = document.getElementById("chat-form");
 const input = document.getElementById("question");
 const sendButton = chatForm.querySelector("button");
 
-let sessionId = null;
+let sessionId = sessionStorage.getItem("session_id") || null;
 let busy = false;
 
 function addMessage(text, role) {
     const element = document.createElement("div");
     element.className = `message ${role}`;
+
     element.textContent = text;
 
     chatBox.appendChild(element);
@@ -109,11 +110,13 @@ chatForm.addEventListener("submit", async (event) => {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(
-                data.detail || "Request failed"
-            );
+            // If session expired or was wiped after backend restart, auto-create a new one
+            if (data.detail && data.detail.includes("session")) {
+                await createSession();
+                throw new Error("Previous session expired. A new session was created — please ask your question again!");
+            }
+            throw new Error(data.detail || "Request failed");
         }
-
         reply.textContent = data.answer;
 
         if (data.sources?.length) {

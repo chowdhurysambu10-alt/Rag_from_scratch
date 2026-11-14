@@ -6,20 +6,24 @@ from uuid import uuid4
 
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
+
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_huggingface import HuggingFaceEmbeddings
+
+from langchain_groq import ChatGroq
 
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 
 # Keep these settings aligned with your ingestion pipeline.
+
+
 PERSIST_DIRECTORY = str(ROOT / os.getenv("CHROMA_DIRECTORY", "db/chroma_local"))
 COLLECTION_NAME = os.getenv("CHROMA_COLLECTION", "rag_documents_v2")
 EMBEDDING_MODEL = os.getenv(
     "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
 )
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+LLM_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 MAX_HISTORY_TURNS = 6
 MAX_HISTORY_MESSAGES = MAX_HISTORY_TURNS * 2
 SESSION_TTL = 30 * 60  # Seconds of inactivity
@@ -31,13 +35,18 @@ store_lock = RLock()
 
 def extract_text(content):
     """Extract text from Gemini/LangChain response content blocks."""
-    if isinstance(content, str):
+    if isinstance(content,str):
+        
         return content
-    if isinstance(content, list):
+    
+    if isinstance(content,list):
         return "".join(
+            
             item if isinstance(item, str) else item.get("text", "")
             for item in content
+            
             if isinstance(item, str)
+            
             or (isinstance(item, dict) and item.get("type") == "text")
         )
     return str(content) if content is not None else ""
@@ -115,8 +124,15 @@ def setup_rag():
             f"Warning: Chroma collection '{COLLECTION_NAME}' is empty. "
             "Check your ingestion collection name and directory."
         )
-    retriever = db.as_retriever(search_kwargs={"k": 3})
-    model = ChatGoogleGenerativeAI(model=GEMINI_MODEL)
+    retriever = db.as_retriever(search_kwargs={"k": 6})
+    groq_api_key = os.getenv("GROQ_API_KEY")
+    if not groq_api_key:
+        raise ValueError("GROQ_API_KEY is not set. Please provide it in your .env file or environment.")
+    model = ChatGroq(
+        model=os.getenv("GROQ_MODEL", LLM_MODEL),
+        api_key=groq_api_key,
+        streaming=True
+    )
     return retriever, model
 
 

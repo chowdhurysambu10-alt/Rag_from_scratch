@@ -167,7 +167,7 @@ uploadBtn.addEventListener("click", async () => {
 
         // Chat page can now use this session
         // Uncomment after your chat page is ready:
-        // window.location.href = "index.html";
+        window.location.href = "index.html";
 
     } catch (error) {
 

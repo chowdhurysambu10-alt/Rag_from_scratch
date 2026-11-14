@@ -5,12 +5,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from pathlib import Path
 import hashlib
-from langchain_community.document_loaders import (
-    TextLoader,
-    PyPDFLoader,
-    CSVLoader,
-    Docx2txtLoader
-)
+from langchain_community.document_loaders import (TextLoader,PyPDFLoader,CSVLoader,Docx2txtLoader)
 from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 
@@ -26,8 +21,12 @@ def handle_upload(content: bytes, original_filename: str, session_id: str):
     splits into chunks, and indexes into an isolated ChromaDB collection.
     """
     ext = Path(original_filename).suffix.lower()
-    collection_name = f"session_{session_id}"
+
+    collection_name = os.getenv("CHROMA_COLLECTION", "rag_documents_v2")
+
     persist_dir = os.getenv("CHROMA_DIRECTORY", "db/chroma_local")
+
+
     embedding_model_name = os.getenv(
         "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
     )
@@ -38,23 +37,36 @@ def handle_upload(content: bytes, original_filename: str, session_id: str):
     try:
         # 2. Select the right loader based on file extension
         if ext == ".pdf":
+
             loader = PyPDFLoader(tmp_path)
+
         elif ext in [".txt", ".py", ".cpp", ".h"]:
+
             loader = TextLoader(tmp_path, encoding="utf-8", autodetect_encoding=True)
+            
         elif ext == ".csv":
+
             loader = CSVLoader(tmp_path, autodetect_encoding=True)
         elif ext == ".docx":
+
             loader = Docx2txtLoader(tmp_path)
         else:
+
             raise ValueError(f"Unsupported file format: {ext}")
+
         raw_docs = loader.load()
+
         if not raw_docs:
+
             raise ValueError("No text could be extracted from this document.")
         # Attach original filename and session metadata to every page/chunk
+
         for doc in raw_docs:
+
             doc.metadata["source"] = original_filename
             doc.metadata["session_id"] = session_id
         # 3. Split into overlapping chunks
+
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=700,
             chunk_overlap=120,
@@ -62,6 +74,7 @@ def handle_upload(content: bytes, original_filename: str, session_id: str):
         )
         chunks = text_splitter.split_documents(raw_docs)
         # 4. Create deterministic chunk IDs (prevents duplicate indexing)
+
         ids = [
             hashlib.sha256(
                 f"{session_id}:{original_filename}:{chunk.page_content}".encode("utf-8")
@@ -199,7 +212,11 @@ def create_vector_store(
     return vectorstore
 
 
-# main functiin and 
+
+
+
+
+# main functiin
 
 def main():
     print("Main Function")

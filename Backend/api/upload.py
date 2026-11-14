@@ -41,10 +41,15 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     try:
         # 5. Call ingestion service
+        from history_aware_generation import create_session
+
+        session_id = create_session()
+
         result = handle_upload(
             content=content,
-            original_filename=file.filename
-        )
+            original_filename=file.filename,
+            session_id=session_id
+)
 
         return {
             "success": True,
