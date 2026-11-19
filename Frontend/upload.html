@@ -4,135 +4,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Documents | RAG AI</title>
-    <link rel="stylesheet" href="upload.css">
+    <title>Upload Documents — RAG AI</title>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/upload.css">
 </head>
 
 <body>
 
-    <div class="app-container">
+    <div class="app-shell">
 
-        <!-- Sidebar -->
+        <!-- Mobile Drawer Backdrop -->
+        <div class="sidebar-backdrop"></div>
+
+        <!-- Sidebar Navigation -->
         <aside class="sidebar">
-            <div class="brand">
-                <span class="brand-icon">✦</span>
-                <span>RAG AI</span>
+            <div class="sidebar-header">
+                <a href="index.html" class="brand">
+                    <div class="brand-icon">✦</div>
+                    <div class="brand-title">
+                        <span>RAG</span>
+                        <span class="brand-badge">PRO</span>
+                    </div>
+                </a>
+                <button class="sidebar-close-btn" aria-label="Close Sidebar">✕</button>
             </div>
 
-            <nav class="navigation">
-                <a href="index.html" class="nav-link">
-                    <span>💬</span> Chat
-                </a>
+            <div class="sidebar-action-wrap">
+                <button class="new-chat-btn" id="sidebarNewChatBtn">
+                    <span>+</span> New Chat
+                </button>
+            </div>
 
-                <a href="upload.html" class="nav-link active">
-                    <span>📁</span> Upload Documents
+            <!-- Primary Nav -->
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <span class="nav-icon">💬</span>
+                    <span>Chat</span>
+                </a>
+                <a href="upload.html" class="nav-item active">
+                    <span class="nav-icon">📁</span>
+                    <span>Upload Documents</span>
+                </a>
+                <a href="documents.html" class="nav-item">
+                    <span class="nav-icon">📚</span>
+                    <span>My Documents</span>
                 </a>
             </nav>
 
+            <!-- Recent Conversations History -->
+            <div class="sidebar-history-section">
+                <div class="history-heading-wrap">
+                    <span class="history-heading">Recent Chats</span>
+                    <span class="history-badge">0</span>
+                </div>
+                <ul class="history-list">
+                    <!-- Injected by history.js & sidebar.js -->
+                </ul>
+            </div>
+
+            <!-- Footer / Workspace Status -->
             <div class="sidebar-footer">
-                <span>●</span> Local Workspace
+                <div class="status-pill">
+                    <div class="status-dot"></div>
+                    <span>Local ChromaDB (Connected)</span>
+                </div>
+                <div class="collection-badge">Collection: rag_documents_v2</div>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
 
+            <!-- Topbar -->
             <header class="topbar">
-                <div>
-                    <h2>Upload Documents</h2>
-                    <p>Add documents to your personal knowledge base.</p>
+                <div class="topbar-left">
+                    <button class="menu-toggle-btn" aria-label="Open Navigation Menu">☰</button>
+                    <div class="topbar-titles">
+                        <h2 class="topbar-title">Document Upload</h2>
+                    </div>
                 </div>
-                <div class="user-avatar">U</div>
+
+                <div class="topbar-right">
+                    <a href="documents.html" class="btn btn-secondary" style="font-size: 12px; padding: 7px 14px;">
+                        <span>📚</span> View All Documents
+                    </a>
+                </div>
             </header>
 
-            <section class="upload-section">
+            <!-- Upload Shell -->
+            <section class="upload-shell">
 
-                <div class="page-heading">
-                    <h1>Build your knowledge base</h1>
+                <div class="upload-heading">
+                    <h1>Upload Data </h1>
                     <p>
-                        Upload your documents and let AI understand
-                        their content.
+                        Upload your PDF documents to extract text, generate vector embeddings,
+                        and empower the AI assistant with verified knowledge.
                     </p>
                 </div>
 
-                <!-- Upload Box -->
-                <div class="upload-box" id="dropZone">
-
-                    <div class="upload-icon">↑</div>
-
-                    <h3>Drag and drop your PDF here</h3>
-
-                    <p>or select a file from your device</p>
+                <!-- Drag & Drop Zone -->
+                <div class="dropzone-container" id="dropzone">
+                    <div class="dropzone-icon-wrap">↑</div>
+                    <h3 class="dropzone-title">Drag and drop here</h3>
+                    <p class="dropzone-desc">or select a file directly from your device</p>
 
                     <input type="file" id="fileInput" accept=".pdf,application/pdf" hidden>
 
-                    <button class="browse-btn" id="browseBtn">
-                        Browse Files
+                    <button type="button" class="browse-btn" id="browseBtn">
+                        <span>📂</span> Browse Files
                     </button>
 
-                    <span class="file-info">
-                        Supported format: PDF
+                    <span class="dropzone-formats">
+                        Supported format: <strong>PDF</strong> • Maximum size: <strong>20 MB</strong>
                     </span>
                 </div>
 
-                <!-- Selected File -->
-                <div class="file-card" id="fileCard" hidden>
-
-                    <div class="file-icon">PDF</div>
-
-                    <div class="file-details">
-                        <h4 id="fileName">document.pdf</h4>
-                        <p id="fileSize">0 MB</p>
+                <!-- Selected File Preview Card -->
+                <div class="selected-file-card" id="selectedFileCard" hidden>
+                    <div class="file-type-icon">PDF</div>
+                    <div class="file-info-wrap">
+                        <div class="file-name-text" id="fileNameDisplay">document.pdf</div>
+                        <div class="file-size-text" id="fileSizeDisplay">0 MB</div>
                     </div>
-
-                    <button id="removeBtn" class="remove-btn" aria-label="Remove selected file">
+                    <button type="button" class="file-remove-btn" id="removeFileBtn" title="Remove selected file"
+                        aria-label="Remove">
                         ✕
                     </button>
                 </div>
 
-                <!-- Upload Button -->
-                <button class="upload-btn" id="uploadBtn" disabled>
-                    Upload Document →
+                <!-- Upload Submit Action -->
+                <button type="button" class="upload-action-btn" id="uploadActionBtn" disabled>
+                    <span>Upload & Process Document →</span>
                 </button>
 
-                <p class="status-message" id="statusMessage" aria-live="polite"></p>
+                <!-- Error Notification Card -->
+                <!-- <div class="upload-error-card" id="uploadErrorCard" hidden>
+                    <span class="error-icon">⚠️</span>
+                    <div class="error-details">
+                        <strong>Upload Failed:</strong> <span id="errorMessageText">An error occurred during
+                            processing.</span>
+                    </div>
+                </div> -->
 
-                <!-- Information -->
-                <div class="info-card">
-                    <h3>What happens after uploading?</h3>
+                <!-- 5-Stage Processing Workflow Stepper -->
+                <div class="workflow-section" id="workflowSection" hidden>
+                    <div class="workflow-header">
+                        <h4 class="workflow-title">
+                            <span>⚙️</span> Ingestion Pipeline
+                        </h4>
+                        <p class="workflow-desc">Tracking real-time document transformation and vector storage stages.
+                        </p>
+                    </div>
 
-                    <div class="steps">
-                        <div class="step">
-                            <span>01</span>
-                            <div>
-                                <h4>Document Processing</h4>
-                                <p>Extract text from your PDF.</p>
+                    <div class="stepper-list">
+                        <!-- Step 1 -->
+                        <div class="stepper-item" id="stepItem1">
+                            <div class="step-node">1</div>
+                            <div class="step-details">
+                                <div class="step-name">1. PDF Upload</div>
+                                <div class="step-subtext">Secure transfer to the FastAPI server</div>
                             </div>
+                            <div class="step-status-badge">Waiting</div>
                         </div>
 
-                        <div class="step">
-                            <span>02</span>
-                            <div>
-                                <h4>Text Chunking</h4>
-                                <p>Split the document into smaller chunks.</p>
+                        <!-- Step 2 -->
+                        <div class="stepper-item" id="stepItem2">
+                            <div class="step-node">2</div>
+                            <div class="step-details">
+                                <div class="step-name">2. Text Extraction</div>
+                                <div class="step-subtext">Extracting digital text from document pages</div>
                             </div>
+                            <div class="step-status-badge">Waiting</div>
                         </div>
 
-                        <div class="step">
-                            <span>03</span>
-                            <div>
-                                <h4>Embedding Generation</h4>
-                                <p>Convert chunks into vector embeddings.</p>
+                        <!-- Step 3 -->
+                        <div class="stepper-item" id="stepItem3">
+                            <div class="step-node">3</div>
+                            <div class="step-details">
+                                <div class="step-name">3. Text Chunking</div>
+                                <div class="step-subtext">Splitting text into 700-character overlapping chunks</div>
                             </div>
+                            <div class="step-status-badge">Waiting</div>
                         </div>
 
-                        <div class="step">
-                            <span>04</span>
-                            <div>
-                                <h4>Vector Storage</h4>
-                                <p>Store embeddings in ChromaDB.</p>
+                        <!-- Step 4 -->
+                        <div class="stepper-item" id="stepItem4">
+                            <div class="step-node">4</div>
+                            <div class="step-details">
+                                <div class="step-name">4. Embedding Generation</div>
+                                <div class="step-subtext">Computing vectors using all-MiniLM-L6-v2</div>
                             </div>
+                            <div class="step-status-badge">Waiting</div>
                         </div>
+
+                        <!-- Step 5 -->
+                        <div class="stepper-item" id="stepItem5">
+                            <div class="step-node">5</div>
+                            <div class="step-details">
+                                <div class="step-name">5. Vector Storage</div>
+                                <div class="step-subtext">Persisting embeddings to ChromaDB collection</div>
+                            </div>
+                            <div class="step-status-badge">Waiting</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success Result Card -->
+                <div class="upload-success-card" id="uploadSuccessCard" hidden>
+                    <div class="success-icon-badge">✓</div>
+                    <h3 class="success-card-title" id="successTitle">Document Processed Successfully!</h3>
+                    <p class="success-card-details" id="successDetails">
+                        Your file has been indexed into ChromaDB.
+                    </p>
+                    <div class="success-card-actions">
+                        <button type="button" class="btn btn-primary" id="chatDocBtn">
+                            <span>💬</span> Start Chatting →
+                        </button>
+                        <a href="documents.html" class="btn btn-secondary" id="viewDocsBtn">
+                            <span>📚</span> View in My Documents
+                        </a>
                     </div>
                 </div>
 
@@ -140,7 +231,14 @@
         </main>
     </div>
 
-    <script src="upload.js"></script>
+    <!-- Toast Notification Container -->
+    <div class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/upload.js"></script>
 </body>
 
 </html>

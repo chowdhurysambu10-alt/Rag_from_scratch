@@ -1,34 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>RAG Assistant</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG AI — Intelligent Document Assistant</title>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/chat.css">
+    <!-- Optional CDN Markdown Renderer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
+
 <body>
 
-    <main class="chat-container">
-        <header>
-            <h2>RAG Assistant</h2>
-            <button id="new-chat">New Chat</button>
-        </header>
+    <div class="app-shell">
 
-        <div id="chat-box"></div>
+        <!-- Mobile Drawer Backdrop -->
+        <div class="sidebar-backdrop"></div>
 
-        <form id="chat-form">
-            <input
-                id="question"
-                placeholder="Ask about your documents..."
-                autocomplete="off"
-                required
-            >
-            <button type="submit">Send</button>
-        </form>
-    </main>
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="brand">
+                    <div class="brand-icon">✦</div>
+                    <div class="brand-title">
+                        <span>RAG</span>
+                        <span class="brand-badge">PRO</span>
+                    </div>
+                </a>
+                <button class="sidebar-close-btn" aria-label="Close Sidebar">✕</button>
+            </div>
 
-    <script src="app.js"></script>
+            <div class="sidebar-action-wrap">
+                <button class="new-chat-btn" id="sidebarNewChatBtn">
+                    <span>+</span> New Chat
+                </button>
+            </div>
+
+            <!-- Primary Nav -->
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item active">
+                    <span class="nav-icon">💬</span>
+                    <span>Chat</span>
+                </a>
+                <a href="upload.html" class="nav-item">
+                    <span class="nav-icon">📁</span>
+                    <span>Upload Documents</span>
+                </a>
+                <a href="documents.html" class="nav-item">
+                    <span class="nav-icon">📚</span>
+                    <span>My Documents</span>
+                </a>
+            </nav>
+
+            <!-- Recent Conversations History -->
+            <div class="sidebar-history-section">
+                <div class="history-heading-wrap">
+                    <span class="history-heading">Recent Chats</span>
+                    <span class="history-badge">0</span>
+                </div>
+                <ul class="history-list">
+                    <!-- Injected by history.js & sidebar.js -->
+                </ul>
+            </div>
+
+            <!-- Footer / Workspace Status -->
+            <div class="sidebar-footer">
+                <div class="status-pill">
+                    <div class="status-dot"></div>
+                    <span>Local ChromaDB (Connected)</span>
+                </div>
+                <div class="collection-badge">Collection: rag_documents_v2</div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="main-content chat-shell">
+
+            <!-- Chat Topbar -->
+            <header class="chat-topbar">
+                <div class="chat-topbar-left">
+                    <button class="menu-toggle-btn" aria-label="Open Navigation Menu">☰</button>
+                    <div class="conversation-meta">
+                        <div class="conversation-title-wrap">
+                            <h2 class="conversation-title-display" id="convTitleDisplay">New Conversation</h2>
+                            <button class="rename-conv-icon" id="renameConvBtn" title="Rename conversation"
+                                aria-label="Rename">✎</button>
+                        </div>
+                        <div class="grounding-indicator">
+                            <div class="grounding-pulse"></div>
+                            <span>Grounded in Knowledge Base (ChromaDB)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="upload.html" class="btn btn-secondary" style="font-size: 12px; padding: 7px 12px;">
+                        <span>📁</span> Upload PDF
+                    </a>
+                </div>
+            </header>
+
+            <!-- Chat Messages Viewport -->
+            <div class="chat-viewport" id="chatViewport">
+                <div class="chat-content-wrap" id="chatContentWrap">
+                    <!-- Populated dynamically by chat.js -->
+                </div>
+            </div>
+
+            <!-- Fixed Composer -->
+            <div class="chat-composer-wrap">
+                <form class="composer-box" id="chatForm">
+                    <textarea id="chatInput" class="chat-input" rows="1"
+                        placeholder="Ask anything about your uploaded documents..." autocomplete="off"
+                        required></textarea>
+                    <div class="composer-actions">
+                        <button type="submit" class="send-btn" id="sendBtn" title="Send message" disabled>
+                            <span>↑</span>
+                        </button>
+                    </div>
+                </form>
+                <div class="composer-hints">
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/chat.js"></script>
 </body>
+
 </html>

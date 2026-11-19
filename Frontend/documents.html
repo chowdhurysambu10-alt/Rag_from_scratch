@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Documents — RAG AI Knowledge Base</title>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/documents.css">
+</head>
+
+<body>
+
+    <div class="app-shell">
+
+        <!-- Mobile Drawer Backdrop -->
+        <div class="sidebar-backdrop"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="brand">
+                    <div class="brand-icon">✦</div>
+                    <div class="brand-title">
+                        <span>RAG</span>
+                        <span class="brand-badge">PRO</span>
+                    </div>
+                </a>
+                <button class="sidebar-close-btn" aria-label="Close Sidebar">✕</button>
+            </div>
+
+            <div class="sidebar-action-wrap">
+                <button class="new-chat-btn" id="sidebarNewChatBtn">
+                    <span>+</span> New Chat
+                </button>
+            </div>
+
+            <!-- Primary Nav -->
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <span class="nav-icon">💬</span>
+                    <span>Chat</span>
+                </a>
+                <a href="upload.html" class="nav-item">
+                    <span class="nav-icon">📁</span>
+                    <span>Upload Documents</span>
+                </a>
+                <a href="documents.html" class="nav-item active">
+                    <span class="nav-icon">📚</span>
+                    <span>My Documents</span>
+                </a>
+            </nav>
+
+            <!-- Recent Conversations History -->
+            <div class="sidebar-history-section">
+                <div class="history-heading-wrap">
+                    <span class="history-heading">Recent Chats</span>
+                    <span class="history-badge">0</span>
+                </div>
+                <ul class="history-list">
+                    <!-- Injected by history.js & sidebar.js -->
+                </ul>
+            </div>
+
+            <!-- Footer / Workspace Status -->
+            <div class="sidebar-footer">
+                <div class="status-pill">
+                    <div class="status-dot"></div>
+                    <span>Local ChromaDB (Connected)</span>
+                </div>
+                <div class="collection-badge">Collection: rag_documents_v2</div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle-btn" aria-label="Open Navigation Menu">☰</button>
+                    <div class="topbar-titles">
+                        <h2 class="topbar-title">Knowledge Base Documents</h2>
+                        <span class="topbar-subtitle">Inspect, query, and manage vector embeddings stored in
+                            ChromaDB</span>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="upload.html" class="btn btn-primary" style="font-size: 12.5px; padding: 8px 16px;">
+                        <span>+</span> Upload Document
+                    </a>
+                </div>
+            </header>
+
+            <!-- Documents Shell -->
+            <section class="documents-shell">
+
+                <!-- Statistics Metrics Overview -->
+                <div class="stats-grid">
+                    <!-- Stat 1 -->
+                    <div class="stat-metric-card">
+                        <div class="stat-icon-wrap purple">📁</div>
+                        <div class="stat-content">
+                            <span class="stat-label">Total Documents</span>
+                            <span class="stat-value" id="totalDocsVal">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Stat 2 -->
+                    <div class="stat-metric-card">
+                        <div class="stat-icon-wrap blue">🧩</div>
+                        <div class="stat-content">
+                            <span class="stat-label">Indexed Chunks</span>
+                            <span class="stat-value" id="totalChunksVal">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Stat 3 -->
+                    <div class="stat-metric-card">
+                        <div class="stat-icon-wrap green">⚡</div>
+                        <div class="stat-content">
+                            <span class="stat-label">Vector Collection</span>
+                            <span class="stat-value code-val">rag_documents_v2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toolbar: Search & Filters -->
+                <div class="docs-toolbar">
+                    <div class="docs-toolbar-left">
+                        <div class="search-field-box">
+                            <span class="search-field-icon">🔍</span>
+                            <input type="text" id="searchFieldInput" class="search-field-input"
+                                placeholder="Search indexed documents by filename..." autocomplete="off">
+                        </div>
+
+                        <div class="filter-pills-wrap">
+                            <button type="button" class="filter-pill active" data-filter="all">All Documents</button>
+                            <button type="button" class="filter-pill" data-filter="pdf">PDFs</button>
+                            <button type="button" class="filter-pill" data-filter="other">Other</button>
+                        </div>
+                    </div>
+
+                    <div class="docs-toolbar-right">
+                        <button type="button" class="btn btn-secondary" id="refreshDocsBtn"
+                            title="Refresh document list">
+                            <span>↻</span> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Skeleton Loading State -->
+                <!-- <div class="docs-grid" id="skeletonWrap">
+                    <div class="skeleton-card">
+                        <div class="skeleton-header">
+                            <div class="skeleton-icon skeleton-shimmer"></div>
+                            <div style="flex: 1;">
+                                <div class="skeleton-title skeleton-shimmer"></div>
+                                <div class="skeleton-subtitle skeleton-shimmer"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-body skeleton-shimmer"></div>
+                        <div class="skeleton-footer skeleton-shimmer"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-header">
+                            <div class="skeleton-icon skeleton-shimmer"></div>
+                            <div style="flex: 1;">
+                                <div class="skeleton-title skeleton-shimmer"></div>
+                                <div class="skeleton-subtitle skeleton-shimmer"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-body skeleton-shimmer"></div>
+                        <div class="skeleton-footer skeleton-shimmer"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-header">
+                            <div class="skeleton-icon skeleton-shimmer"></div>
+                            <div style="flex: 1;">
+                                <div class="skeleton-title skeleton-shimmer"></div>
+                                <div class="skeleton-subtitle skeleton-shimmer"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-body skeleton-shimmer"></div>
+                        <div class="skeleton-footer skeleton-shimmer"></div>
+                    </div>
+                </div> -->
+
+                <!-- Active Document Cards Grid -->
+                <div class="docs-grid" id="docsGrid" hidden>
+                    <!-- Populated by documents.js -->
+                </div>
+
+                <!-- Empty State -->
+                <div class="state-panel" id="emptyState" hidden>
+                    <div class="state-icon">📭</div>
+                    <h3 class="state-title">No documents in your knowledge base</h3>
+                    <p class="state-desc">
+                        Upload your first PDF document to start querying and generating answers with AI.
+                    </p>
+                    <a href="upload.html" class="btn btn-primary">
+                        <span>+</span> Upload Your First Document
+                    </a>
+                </div>
+
+                <!-- Error State -->
+                <div class="state-panel" id="errorState" hidden>
+                    <div class="state-icon">⚠️</div>
+                    <h3 class="state-title">Unable to connect to ChromaDB</h3>
+                    <p class="state-desc" id="errorMessageText">
+                        Ensure the FastAPI backend server is running on port 8000.
+                    </p>
+                    <button type="button" class="btn btn-secondary" onclick="location.reload()">
+                        Retry Connection
+                    </button>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <!-- Deletion Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">Delete Document</h3>
+                <button class="modal-close-btn" id="modalCloseBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="modalFilenameDisplay">document.pdf</strong>?</p>
+                <p style="margin-top: 10px; color: var(--text-muted); font-size: 12.5px;">
+                    This will permanently delete all <strong id="modalChunksDisplay">vector chunks</strong> associated
+                    with this document from ChromaDB.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Document</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/documents.js"></script>
+</body>
+
+</html>

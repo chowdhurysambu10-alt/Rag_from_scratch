@@ -20,7 +20,7 @@ const chatForm = document.getElementById("chat-form");
 const input = document.getElementById("question");
 const sendButton = chatForm.querySelector("button");
 
-let sessionId = sessionStorage.getItem("session_id") || null;
+let sessionId = localStorage.getItem("session_id") || localStorage.getItem("rag_ai_active_conv_id") || null;
 let busy = false;
 
 function addMessage(text, role) {
@@ -64,6 +64,8 @@ async function createSession() {
         }
 
         sessionId = data.session_id;
+        localStorage.setItem("session_id", sessionId);
+        localStorage.setItem("rag_ai_active_conv_id", sessionId);
 
         console.log("Session created:", sessionId);
 

@@ -132,8 +132,13 @@ uploadBtn.addEventListener("click", async () => {
     if (!selectedFile) return;
 
     const formData = new FormData();
-
     formData.append("file", selectedFile);
+
+    // Reuse existing session from localStorage if present
+    const existingSession = localStorage.getItem("session_id") || localStorage.getItem("rag_ai_active_conv_id");
+    if (existingSession) {
+        formData.append("session_id", existingSession);
+    }
 
     uploadBtn.disabled = true;
     uploadBtn.textContent = "Processing Document...";
@@ -153,9 +158,10 @@ uploadBtn.addEventListener("click", async () => {
             throw new Error(data.detail || "Upload failed");
         }
 
-        // Save session for subsequent chat requests
-        sessionStorage.setItem("session_id", data.session_id);
-        sessionStorage.setItem("document_id", data.document_id);
+        // Save session persistently in localStorage for subsequent chat requests
+        localStorage.setItem("session_id", data.session_id);
+        localStorage.setItem("rag_ai_active_conv_id", data.session_id);
+        localStorage.setItem("document_id", data.document_id);
 
         showStatus(
             `Success! ${data.filename} indexed. ${data.chunks} chunks created.`
