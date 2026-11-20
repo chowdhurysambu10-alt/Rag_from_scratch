@@ -1,7 +1,7 @@
 /**
  * RAG AI - Knowledge Base Documents Manager
  * Handles document metrics, search & filtering, skeleton states,
- * deletion modal confirmation, and direct ChromaDB management.
+ * deletion modal confirmation, and direct Qdrant Cloud management.
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -81,7 +81,7 @@ async function fetchDocuments() {
         allDocuments = data.documents || [];
 
         // Update statistics cards
-        updateMetricCards(data.total_documents, data.total_chunks);
+        updateMetricCards(data.total_documents, data.total_chunks, data.collection);
 
         if (skeletonWrap) skeletonWrap.hidden = true;
 
@@ -105,12 +105,14 @@ async function fetchDocuments() {
 /**
  * Update Metric / Statistics Overview Cards.
  */
-function updateMetricCards(totalDocs, totalChunks) {
+function updateMetricCards(totalDocs, totalChunks, collection) {
     const totalDocsVal = document.getElementById("totalDocsVal");
     const totalChunksVal = document.getElementById("totalChunksVal");
+    const collectionVal = document.getElementById("collectionVal");
 
-    if (totalDocsVal) totalDocsVal.textContent = (totalDocs || 0).toLocaleString();
-    if (totalChunksVal) totalChunksVal.textContent = (totalChunks || 0).toLocaleString();
+    if (totalDocsVal) totalDocsVal.textContent = (totalDocs !== undefined && totalDocs !== null ? totalDocs : 0).toLocaleString();
+    if (totalChunksVal) totalChunksVal.textContent = (totalChunks !== undefined && totalChunks !== null ? totalChunks : 0).toLocaleString();
+    if (collectionVal && collection) collectionVal.textContent = collection;
 }
 
 /**
@@ -181,7 +183,10 @@ function renderDocumentCards(docs) {
                     <strong>${doc.pages}</strong> ${doc.pages === 1 ? "page" : "pages"}
                 </span>
                 <span class="doc-pill status-ready">
-                    <span class="status-tiny-dot"></span> Active
+                    <span class="status-tiny-dot"></span> ${escapeHtml(doc.status || "Indexed")}
+                </span>
+                <span class="doc-pill uploader-pill" title="Uploaded by ${escapeHtml(doc.uploaded_by || "Shared Library")}">
+                    👤 ${escapeHtml(doc.uploaded_by || "Shared Library")}
                 </span>
             </div>
 
@@ -213,8 +218,19 @@ function renderDocumentCards(docs) {
 
 /**
  * Open the deletion confirmation modal.
+ * Enforces admin or uploader authorization for shared documents.
  */
 function openDeleteModal(doc) {
+    const user = window.authService ? window.authService.getUser() : null;
+    const isAdmin = user && (user.role === "admin" || (user.email && user.email.toLowerCase().includes("admin")));
+    const isUploader = user && doc.uploaded_by && user.email === doc.uploaded_by;
+
+    // In multi-user mode, restrict deletion if user is not admin or uploader
+    if (user && !user.isGuest && !isAdmin && !isUploader) {
+        showToast("Administrator authorization required to delete shared Knowledge Base documents.", "error");
+        return;
+    }
+
     pendingDeleteDoc = doc;
     const deleteModal = document.getElementById("deleteModal");
     const modalFilenameDisplay = document.getElementById("modalFilenameDisplay");
@@ -253,7 +269,7 @@ async function executeDocumentDeletion() {
 
         // Update list
         allDocuments = allDocuments.filter(d => d.filename !== filename);
-        const newTotalChunks = allDocuments.reduce((sum, d) => sum + d.chunks, 0);
+        const newTotalChunks = result.remaining_chunks !== undefined ? result.remaining_chunks : allDocuments.reduce((sum, d) => sum + d.chunks, 0);
         updateMetricCards(allDocuments.length, newTotalChunks);
 
         showToast(`"${filename}" deleted (${result.deleted_chunks} chunks removed)`, "success");

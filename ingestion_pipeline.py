@@ -1,8 +1,9 @@
 import os
+from uuid import uuid5, NAMESPACE_DNS
 from langchain_community.document_loaders import TextLoader, DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_chroma import Chroma
+from Backend.services.qdrant_service import get_qdrant_vector_store, get_qdrant_client, QDRANT_COLLECTION
 from pathlib import Path
 import hashlib
 from langchain_community.document_loaders import (
@@ -113,21 +114,19 @@ def split_documents(documents):
 
 def create_vector_store(
     chunks,
-    persist_directory="db/chroma_local"
+    collection_name=QDRANT_COLLECTION
 ):
-    """Create or update ChromaDB without duplicate chunk IDs."""
+    """Create or update Qdrant Cloud collection without duplicate chunk IDs."""
 
-    print("Initializing ChromaDB...")
+    print("Initializing Qdrant Cloud Vector Store...")
 
     embedding_model = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    vectorstore = Chroma(
-        collection_name="rag_documents_v2",
-        embedding_function=embedding_model,
-        persist_directory=persist_directory,
-        collection_metadata={"hnsw:space": "cosine"}
+    vectorstore = get_qdrant_vector_store(
+        embeddings=embedding_model,
+        collection_name=collection_name
     )
 
     if not chunks:
@@ -140,13 +139,9 @@ def create_vector_store(
         source = chunk.metadata.get("source", "unknown")
         content = chunk.page_content
 
-        # Stable ID based on source and chunk content
+        # Stable RFC 4122 UUID for Qdrant based on source and chunk content
         raw_id = f"{source}:{content}"
-
-        chunk_id = hashlib.sha256(
-            raw_id.encode("utf-8")
-        ).hexdigest()
-
+        chunk_id = str(uuid5(NAMESPACE_DNS, raw_id))
         ids.append(chunk_id)
 
     # Remove identical source/content records in one batch
@@ -160,8 +155,10 @@ def create_vector_store(
         ids=list(unique_chunks.keys())
     )
 
+    client = get_qdrant_client()
+    total_stored = client.count(collection_name).count
     print(f"Ingested {len(unique_chunks)} unique chunks.")
-    print(f"Total stored chunks: {vectorstore._collection.count()}")
+    print(f"Total stored chunks in Qdrant: {total_stored}")
 
     return vectorstore
 

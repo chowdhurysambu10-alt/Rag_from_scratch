@@ -67,7 +67,7 @@
             <div class="sidebar-footer">
                 <div class="status-pill">
                     <div class="status-dot"></div>
-                    <span>Local ChromaDB (Connected)</span>
+                    <span>Qdrant Cloud (Connected)</span>
                 </div>
                 <div class="collection-badge">Collection: rag_documents_v2</div>
             </div>
@@ -81,9 +81,8 @@
                 <div class="topbar-left">
                     <button class="menu-toggle-btn" aria-label="Open Navigation Menu">☰</button>
                     <div class="topbar-titles">
-                        <h2 class="topbar-title">Knowledge Base Documents</h2>
-                        <span class="topbar-subtitle">Inspect, query, and manage vector embeddings stored in
-                            ChromaDB</span>
+                        <h2 class="topbar-title">Shared Knowledge Base</h2>
+                        <span class="topbar-subtitle">Inspect, query, and manage globally shared document embeddings in Qdrant Cloud</span>
                     </div>
                 </div>
 
@@ -122,7 +121,7 @@
                         <div class="stat-icon-wrap green">⚡</div>
                         <div class="stat-content">
                             <span class="stat-label">Vector Collection</span>
-                            <span class="stat-value code-val">rag_documents_v2</span>
+                            <span class="stat-value code-val" id="collectionVal">rag_documents_v2</span>
                         </div>
                     </div>
                 </div>
@@ -208,9 +207,9 @@
                 <!-- Error State -->
                 <div class="state-panel" id="errorState" hidden>
                     <div class="state-icon">⚠️</div>
-                    <h3 class="state-title">Unable to connect to ChromaDB</h3>
+                    <h3 class="state-title">Unable to connect to Qdrant Cloud</h3>
                     <p class="state-desc" id="errorMessageText">
-                        Ensure the FastAPI backend server is running on port 8000.
+                        Ensure the FastAPI backend server is running on port 8000 and Qdrant Cloud credentials are configured.
                     </p>
                     <button type="button" class="btn btn-secondary" onclick="location.reload()">
                         Retry Connection
@@ -232,7 +231,7 @@
                 <p>Are you sure you want to delete <strong id="modalFilenameDisplay">document.pdf</strong>?</p>
                 <p style="margin-top: 10px; color: var(--text-muted); font-size: 12.5px;">
                     This will permanently delete all <strong id="modalChunksDisplay">vector chunks</strong> associated
-                    with this document from ChromaDB.
+                    with this document from Qdrant Cloud.
                 </p>
             </div>
             <div class="modal-footer">
@@ -246,6 +245,9 @@
     <div class="toast-container"></div>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
     <script src="js/history.js"></script>
     <script src="js/sidebar.js"></script>

@@ -69,7 +69,7 @@
             <div class="sidebar-footer">
                 <div class="status-pill">
                     <div class="status-dot"></div>
-                    <span>Local ChromaDB (Connected)</span>
+                    <span>Qdrant Cloud (Connected)</span>
                 </div>
                 <div class="collection-badge">Collection: rag_documents_v2</div>
             </div>
@@ -90,7 +90,7 @@
                         </div>
                         <div class="grounding-indicator">
                             <div class="grounding-pulse"></div>
-                            <span>Grounded in Knowledge Base (ChromaDB)</span>
+                            <span>Grounded in Knowledge Base (Qdrant Cloud)</span>
                         </div>
                     </div>
                 </div>
@@ -132,6 +132,9 @@
     <div class="toast-container"></div>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
     <script src="js/history.js"></script>
     <script src="js/sidebar.js"></script>

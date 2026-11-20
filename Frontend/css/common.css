@@ -763,3 +763,84 @@ html, body {
         padding: 0 18px;
     }
 }
+
+/* ==========================================================================
+   Sidebar User Profile Widget & Auth Status
+   ========================================================================== */
+.sidebar-user-widget {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.user-profile-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, #ded488 100%);
+    color: var(--primary-dark);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px var(--primary-glow);
+}
+
+.user-info-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-email-span {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-role-tag {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.user-role-tag.member {
+    color: #059669;
+}
+
+.user-role-tag.guest {
+    color: #d97706;
+}
+
+.user-logout-btn {
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.user-logout-btn:hover {
+    background: var(--danger-subtle);
+    border-color: #fca5a5;
+    color: var(--danger);
+}
+

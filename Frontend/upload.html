@@ -67,7 +67,7 @@
             <div class="sidebar-footer">
                 <div class="status-pill">
                     <div class="status-dot"></div>
-                    <span>Local ChromaDB (Connected)</span>
+                    <span>Qdrant Cloud (Connected)</span>
                 </div>
                 <div class="collection-badge">Collection: rag_documents_v2</div>
             </div>
@@ -203,7 +203,7 @@
                             <div class="step-node">5</div>
                             <div class="step-details">
                                 <div class="step-name">5. Vector Storage</div>
-                                <div class="step-subtext">Persisting embeddings to ChromaDB collection</div>
+                                <div class="step-subtext">Persisting embeddings to Qdrant Cloud collection</div>
                             </div>
                             <div class="step-status-badge">Waiting</div>
                         </div>
@@ -215,7 +215,7 @@
                     <div class="success-icon-badge">✓</div>
                     <h3 class="success-card-title" id="successTitle">Document Processed Successfully!</h3>
                     <p class="success-card-details" id="successDetails">
-                        Your file has been indexed into ChromaDB.
+                        Your file has been indexed into Qdrant Cloud.
                     </p>
                     <div class="success-card-actions">
                         <button type="button" class="btn btn-primary" id="chatDocBtn">
@@ -235,6 +235,9 @@
     <div class="toast-container"></div>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
     <script src="js/history.js"></script>
     <script src="js/sidebar.js"></script>

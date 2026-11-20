@@ -5,7 +5,8 @@ from threading import RLock
 from uuid import uuid4
 
 from dotenv import load_dotenv
-from langchain_chroma import Chroma
+from qdrant_client import models
+from Backend.services.qdrant_service import get_qdrant_vector_store, QDRANT_COLLECTION
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -18,8 +19,7 @@ load_dotenv(ROOT / ".env")
 # Keep these settings aligned with your ingestion pipeline.
 
 
-PERSIST_DIRECTORY = str(ROOT / os.getenv("CHROMA_DIRECTORY", "db/chroma_local"))
-COLLECTION_NAME = os.getenv("CHROMA_COLLECTION", "rag_documents_v2")
+COLLECTION_NAME = os.getenv("QDRANT_COLLECTION", "rag_documents_v2")
 EMBEDDING_MODEL = os.getenv(
     "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
 )
@@ -129,23 +129,28 @@ def get_embeddings():
 
 
 def get_retriever(embeddings=None, session_id=None):
-    """Create a fresh retriever against the persistent ChromaDB collection.
+    """Create a fresh retriever against the Qdrant Cloud collection.
     
-    Using pre-cached embeddings, this takes ~3ms and ensures newly uploaded
-    documents are immediately searchable without stale in-memory indices.
-    When session_id is provided, applies metadata filtering for strict session isolation.
+    Using pre-cached embeddings, ensures newly uploaded documents are immediately searchable.
+    When session_id is provided, applies metadata filtering for session scoping.
+    When session_id is None, searches across the entire knowledge base.
     """
     if embeddings is None:
         embeddings = get_embeddings()
-    db = Chroma(
-        collection_name=COLLECTION_NAME,
-        persist_directory=PERSIST_DIRECTORY,
-        embedding_function=embeddings,
-    )
+
+    store = get_qdrant_vector_store(embeddings, collection_name=COLLECTION_NAME)
+
     search_kwargs = {"k": 6}
     if session_id:
-        search_kwargs["filter"] = {"session_id": str(session_id)}
-    return db.as_retriever(search_kwargs=search_kwargs)
+        search_kwargs["filter"] = models.Filter(
+            must=[
+                models.FieldCondition(
+                    key="metadata.session_id",
+                    match=models.MatchValue(value=str(session_id))
+                )
+            ]
+        )
+    return store.as_retriever(search_kwargs=search_kwargs)
 
 
 def get_model():
@@ -172,17 +177,36 @@ def setup_rag():
     return retriever, model
 
 
-def ask_question(user_question, session_id, retriever, model):
-    """Rewrite the question, retrieve documents, stream answer, save recent history."""
+def ask_question(user_question, session_id, retriever, model, user_id=None, conversation_id=None):
+    """Rewrite the question, retrieve documents from shared knowledge base, stream answer, and save history."""
     if not user_question.strip():
         raise ValueError("Question cannot be empty")
 
+    actual_conv_id = conversation_id or session_id
     session = get_session(session_id)
     with session["lock"]:
         if time.monotonic() - session["last_active"] > SESSION_TTL:
             raise ValueError("Session expired")
         session["last_active"] = time.monotonic()
         chat_history = list(session["history"][-MAX_HISTORY_MESSAGES:])
+
+        # If Supabase is configured and conversation_id + user_id provided, sync user's private history
+        if actual_conv_id and user_id:
+            try:
+                from Backend.services.supabase_service import get_conversation_messages, is_supabase_configured
+                if is_supabase_configured():
+                    db_msgs = get_conversation_messages(user_id=user_id, conversation_id=actual_conv_id, limit=MAX_HISTORY_MESSAGES)
+                    if db_msgs:
+                        supa_history = []
+                        for m in db_msgs:
+                            if m.get("role") == "user":
+                                supa_history.append(HumanMessage(content=m.get("content", "")))
+                            elif m.get("role") == "assistant":
+                                supa_history.append(AIMessage(content=m.get("content", "")))
+                        if supa_history:
+                            chat_history = supa_history
+            except Exception as e:
+                print(f"Supabase history sync notice: {e}")
 
         print(f"\n--- You asked: {user_question} ---")
 
@@ -291,13 +315,24 @@ def ask_question(user_question, session_id, retriever, model):
         if not answer:
             raise RuntimeError("The model returned an empty answer")
 
-        # Step 6: Save and keep only the latest six question/answer turns.
+        # Step 6: Save and keep only the latest six question/answer turns in memory.
         session["history"].extend([
             HumanMessage(content=user_question),
             AIMessage(content=answer),
         ])
         session["history"] = session["history"][-MAX_HISTORY_MESSAGES:]
         session["last_active"] = time.monotonic()
+
+        # Step 6b: Persist to Supabase if conversation_id and user_id are active
+        if actual_conv_id and user_id:
+            try:
+                from Backend.services.supabase_service import add_message, is_supabase_configured
+                if is_supabase_configured():
+                    add_message(conversation_id=actual_conv_id, user_id=user_id, role="user", content=user_question)
+                    add_message(conversation_id=actual_conv_id, user_id=user_id, role="assistant", content=answer, sources=sources)
+            except Exception as e:
+                print(f"Supabase message persist notice: {e}")
+
         print(f"Memory: {len(session['history']) // 2} turns stored")
 
         print("\nRetrieved sources (not necessarily all cited):")
@@ -308,6 +343,7 @@ def ask_question(user_question, session_id, retriever, model):
             "answer": answer,
             "sources": sources,
             "session_id": session_id,
+            "conversation_id": actual_conv_id
         }
 
 

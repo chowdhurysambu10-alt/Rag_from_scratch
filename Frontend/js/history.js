@@ -1,23 +1,39 @@
 /**
  * RAG AI - Conversation History Manager
- * Manages persistent conversation sessions using browser LocalStorage.
- * Aligns each conversation with a backend session_id.
+ * Manages user-isolated persistent conversation sessions using Supabase & LocalStorage.
+ * Ensures User A can NEVER view or access User B's conversations.
  */
-
-const STORAGE_KEY_CONVERSATIONS = "rag_ai_conversations_v2";
-const STORAGE_KEY_ACTIVE_ID = "rag_ai_active_conv_id";
 
 class ConversationHistory {
     constructor() {
         this.conversations = this.loadAll();
+        // Sync with Supabase on startup
+        if (typeof window !== "undefined") {
+            setTimeout(() => this.syncRemote(), 500);
+        }
     }
 
     /**
-     * Load all saved conversations from localStorage.
+     * Get storage key scoped to current authenticated user.
+     */
+    getStorageKey() {
+        const user = window.authService ? window.authService.getUser() : null;
+        const uid = user && user.id ? user.id : "guest";
+        return `rag_ai_convs_v3_${uid}`;
+    }
+
+    getActiveKey() {
+        const user = window.authService ? window.authService.getUser() : null;
+        const uid = user && user.id ? user.id : "guest";
+        return `rag_ai_active_id_${uid}`;
+    }
+
+    /**
+     * Load all saved conversations for the current user.
      */
     loadAll() {
         try {
-            const raw = localStorage.getItem(STORAGE_KEY_CONVERSATIONS);
+            const raw = localStorage.getItem(this.getStorageKey());
             if (!raw) return [];
             const list = JSON.parse(raw);
             return Array.isArray(list) ? list : [];
@@ -28,13 +44,49 @@ class ConversationHistory {
     }
 
     /**
-     * Save current conversation list to localStorage.
+     * Save current conversation list for the active user.
      */
     saveAll() {
         try {
-            localStorage.setItem(STORAGE_KEY_CONVERSATIONS, JSON.stringify(this.conversations));
+            localStorage.setItem(this.getStorageKey(), JSON.stringify(this.conversations));
         } catch (e) {
             console.error("Failed to save conversations to storage:", e);
+        }
+    }
+
+    /**
+     * Sync conversations from Supabase backend.
+     */
+    async syncRemote() {
+        try {
+            if (window.ragApi && typeof window.ragApi.getConversations === "function") {
+                const remoteList = await window.ragApi.getConversations();
+                if (Array.isArray(remoteList) && remoteList.length > 0) {
+                    // Merge remote conversations into local state
+                    const merged = [...this.conversations];
+                    for (const r of remoteList) {
+                        const existing = merged.find(c => c.id === r.id);
+                        if (!existing) {
+                            merged.push({
+                                id: r.id,
+                                title: r.title || "Conversation",
+                                createdAt: new Date(r.created_at).getTime() || Date.now(),
+                                updatedAt: new Date(r.updated_at).getTime() || Date.now(),
+                                messages: []
+                            });
+                        } else {
+                            existing.title = r.title || existing.title;
+                        }
+                    }
+                    this.conversations = merged.sort((a, b) => b.updatedAt - a.updatedAt);
+                    this.saveAll();
+                    if (typeof window.renderSidebarHistory === "function") {
+                        window.renderSidebarHistory();
+                    }
+                }
+            }
+        } catch (err) {
+            console.debug("Remote conversations sync notice:", err);
         }
     }
 
@@ -42,20 +94,21 @@ class ConversationHistory {
      * Get the active conversation ID.
      */
     getActiveId() {
-        return localStorage.getItem(STORAGE_KEY_ACTIVE_ID) || null;
+        return localStorage.getItem(this.getActiveKey()) || null;
     }
 
     /**
-     * Ensure an active conversation and persistent session ID exist in localStorage.
+     * Ensure an active conversation and persistent session ID exist.
      */
     async ensureActiveSessionId() {
+        this.conversations = this.loadAll();
         let activeId = this.getActiveId();
         let conv = activeId ? this.conversations.find(c => c.id === activeId) : null;
         if (!activeId || !conv) {
             try {
-                if (window.ragApi && typeof window.ragApi.createSession === "function") {
-                    const res = await window.ragApi.createSession();
-                    activeId = res.session_id;
+                if (window.ragApi && typeof window.ragApi.createConversation === "function") {
+                    const res = await window.ragApi.createConversation("New Conversation");
+                    activeId = res ? res.id : ("session_" + Date.now());
                 } else {
                     activeId = "session_" + Date.now();
                 }
@@ -72,9 +125,9 @@ class ConversationHistory {
      */
     setActiveId(id) {
         if (id) {
-            localStorage.setItem(STORAGE_KEY_ACTIVE_ID, id);
+            localStorage.setItem(this.getActiveKey(), id);
         } else {
-            localStorage.removeItem(STORAGE_KEY_ACTIVE_ID);
+            localStorage.removeItem(this.getActiveKey());
         }
     }
 
@@ -89,8 +142,6 @@ class ConversationHistory {
 
     /**
      * Create and record a new conversation.
-     * @param {string} sessionId
-     * @param {string} [initialTitle="New Conversation"]
      */
     createConversation(sessionId, initialTitle = "New Conversation") {
         const newConv = {
@@ -104,6 +155,12 @@ class ConversationHistory {
         this.conversations.unshift(newConv);
         this.saveAll();
         this.setActiveId(sessionId);
+
+        // Async remote sync
+        if (window.ragApi && typeof window.ragApi.createConversation === "function") {
+            window.ragApi.createConversation(initialTitle).catch(() => {});
+        }
+
         return newConv;
     }
 
@@ -119,6 +176,9 @@ class ConversationHistory {
         // Auto-generate title from the first user question if still default
         if (role === "user" && (conv.title === "New Conversation" || !conv.title)) {
             conv.title = text.length > 36 ? text.slice(0, 36).trim() + "..." : text.trim();
+            if (window.ragApi && typeof window.ragApi.renameConversation === "function") {
+                window.ragApi.renameConversation(convId, conv.title).catch(() => {});
+            }
         }
 
         const msg = {
@@ -151,6 +211,10 @@ class ConversationHistory {
             conv.title = newTitle.trim();
             conv.updatedAt = Date.now();
             this.saveAll();
+
+            if (window.ragApi && typeof window.ragApi.renameConversation === "function") {
+                window.ragApi.renameConversation(convId, conv.title).catch(() => {});
+            }
             return true;
         }
         return false;
@@ -166,6 +230,10 @@ class ConversationHistory {
             this.setActiveId(nextConv ? nextConv.id : null);
         }
         this.saveAll();
+
+        if (window.ragApi && typeof window.ragApi.deleteConversation === "function") {
+            window.ragApi.deleteConversation(convId).catch(() => {});
+        }
     }
 
     /**

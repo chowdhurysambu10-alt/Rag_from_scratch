@@ -188,32 +188,46 @@ function promptDeleteConversation(convId, title) {
 }
 
 /**
- * Ping backend periodically to show connected status dot.
+ * Ping backend periodically to show connected status dot and vector database.
  */
 async function checkBackendStatus() {
     const statusDot = document.querySelector(".status-dot");
     const statusText = document.querySelector(".status-pill span");
+    const collectionBadge = document.querySelector(".collection-badge");
 
-    const updateStatus = (isHealthy) => {
+    const updateStatus = (health) => {
         if (!statusDot || !statusText) return;
-        if (isHealthy) {
+        const isHealthy = health && health.healthy;
+        const isConnected = health && health.connected;
+        const dbName = (health && health.vectorDb) || "Qdrant Cloud";
+        const collName = (health && health.collection) || "rag_documents_v2";
+
+        if (isHealthy && isConnected) {
             statusDot.style.backgroundColor = "var(--success)";
             statusDot.style.boxShadow = "0 0 8px rgba(16, 185, 129, 0.6)";
-            statusText.textContent = "Local ChromaDB (Connected)";
+            statusText.textContent = `${dbName} (Connected)`;
+        } else if (isHealthy) {
+            statusDot.style.backgroundColor = "var(--warning, #f59e0b)";
+            statusDot.style.boxShadow = "0 0 8px rgba(245, 158, 11, 0.6)";
+            statusText.textContent = `${dbName} (Connecting...)`;
         } else {
             statusDot.style.backgroundColor = "var(--danger)";
             statusDot.style.boxShadow = "0 0 8px rgba(239, 68, 68, 0.6)";
             statusText.textContent = "Backend Offline (Port 8000)";
         }
+
+        if (collectionBadge && collName) {
+            collectionBadge.textContent = `Collection: ${collName}`;
+        }
     };
 
-    const isAlive = await window.ragApi.checkHealth();
-    updateStatus(isAlive);
+    const initialHealth = await window.ragApi.checkHealth();
+    updateStatus(initialHealth);
 
     // Poll every 30 seconds
     setInterval(async () => {
-        const healthy = await window.ragApi.checkHealth();
-        updateStatus(healthy);
+        const currentHealth = await window.ragApi.checkHealth();
+        updateStatus(currentHealth);
     }, 30000);
 }
 

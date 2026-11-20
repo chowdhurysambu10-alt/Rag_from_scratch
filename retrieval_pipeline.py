@@ -1,25 +1,18 @@
-from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
-# from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
+from Backend.services.qdrant_service import get_qdrant_vector_store, QDRANT_COLLECTION
 
 load_dotenv()
 
-persistent_directory = "db/chroma_local"
-
-
 embedding_model = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)
 
-
-db = Chroma(
-    collection_name="rag_documents_v2",
-    persist_directory=persistent_directory,
-    embedding_function=embedding_model,
-    collection_metadata={"hnsw:space": "cosine"}  
+db = get_qdrant_vector_store(
+    embeddings=embedding_model,
+    collection_name=QDRANT_COLLECTION
 )
 
 query = "What is C++"

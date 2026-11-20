@@ -125,7 +125,7 @@ function renderDocuments(docs) {
 // Handle document deletion
 async function handleDelete(filename, chunks, cardElement, buttonElement) {
     const confirmed = window.confirm(
-        `Are you sure you want to delete "${filename}" (${chunks} chunks) from ChromaDB?\n\nThis will permanently remove its vector embeddings.`
+        `Are you sure you want to delete "${filename}" (${chunks} chunks) from Qdrant Cloud?\n\nThis will permanently remove its vector embeddings.`
     );
 
     if (!confirmed) return;

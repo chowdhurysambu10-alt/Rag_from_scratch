@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - RAG AI Knowledge Platform</title>
+    <!-- Common Design System -->
+    <link rel="stylesheet" href="css/common.css">
+    <style>
+        .auth-viewport {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-base);
+            padding: 24px 16px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-xl, 16px);
+            box-shadow: 0 10px 30px rgba(35, 30, 15, 0.08), 0 1px 3px rgba(35, 30, 15, 0.04);
+            padding: 36px 32px;
+            transition: all var(--transition-normal);
+        }
+
+        .auth-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .auth-logo-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, #e4d773 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px var(--primary-glow);
+            margin-bottom: 14px;
+        }
+
+        .auth-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+
+        .auth-subtitle {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        /* Tabs */
+        .auth-tabs {
+            display: flex;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg, 12px);
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            padding: 9px 0;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .auth-tab-btn.active {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            box-shadow: 0 2px 6px rgba(35, 30, 15, 0.08);
+        }
+
+        /* Form */
+        .auth-form-group {
+            margin-bottom: 18px;
+        }
+
+        .auth-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .auth-label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .auth-forgot-link {
+            font-size: 12px;
+            color: var(--primary-dark);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .auth-forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .auth-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .auth-input-icon {
+            position: absolute;
+            left: 12px;
+            color: var(--text-muted);
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .auth-input {
+            width: 100%;
+            height: 44px;
+            padding: 0 14px 0 38px;
+            font-size: 14px;
+            color: var(--text-main);
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md, 10px);
+            outline: none;
+            transition: all var(--transition-fast);
+        }
+
+        .auth-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .auth-eye-btn {
+            position: absolute;
+            right: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px;
+        }
+
+        /* Error / Success Alert Banner */
+        .auth-alert {
+            display: none;
+            padding: 10px 14px;
+            border-radius: var(--radius-md, 10px);
+            font-size: 13px;
+            margin-bottom: 18px;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.4;
+        }
+
+        .auth-alert.visible {
+            display: flex;
+        }
+
+        .auth-alert.error {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #b91c1c;
+        }
+
+        .auth-alert.success {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            color: #15803d;
+        }
+
+        .auth-submit-btn {
+            width: 100%;
+            height: 44px;
+            background: var(--primary);
+            border: 1px solid var(--primary-border);
+            border-radius: var(--radius-md, 10px);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 6px var(--primary-glow);
+            margin-top: 6px;
+        }
+
+        .auth-submit-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .auth-submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-footer-notice {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .spinner-inline {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(112, 96, 20, 0.3);
+            border-top-color: var(--primary-dark);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-viewport">
+        <div class="auth-card">
+
+            <!-- Brand Header -->
+            <div class="auth-brand">
+                <div class="auth-logo-badge">✦</div>
+                <h1 class="auth-title">RAG AI Platform</h1>
+                <p class="auth-subtitle">
+                    Global Shared Knowledge Base with private, isolated chat histories.
+                </p>
+            </div>
+
+            <!-- Tabs: Sign In / Create Account -->
+            <div class="auth-tabs" id="authTabs" role="tablist">
+                <button type="button" class="auth-tab-btn active" id="tabSignIn">Sign In</button>
+                <button type="button" class="auth-tab-btn" id="tabSignUp">Create Account</button>
+            </div>
+
+            <!-- Alert Banner -->
+            <div class="auth-alert" id="authAlert" style="display: none;">
+                <span id="alertIcon">⚠️</span>
+                <span id="alertMessage"></span>
+            </div>
+
+            <!-- Auth Form -->
+            <form id="authForm" novalidate>
+                <!-- Email -->
+                <div class="auth-form-group">
+                    <div class="auth-label-row">
+                        <label class="auth-label" for="emailInput">Email Address</label>
+                    </div>
+                    <div class="auth-input-wrap">
+                        <span class="auth-input-icon">✉</span>
+                        <input type="email" id="emailInput" class="auth-input" placeholder="name@company.com" required autocomplete="email">
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="auth-form-group" id="passwordGroup">
+                    <div class="auth-label-row">
+                        <label class="auth-label" for="passwordInput">Password</label>
+                        <a href="javascript:void(0)" class="auth-forgot-link" id="forgotPasswordBtn">Forgot?</a>
+                    </div>
+                    <div class="auth-input-wrap">
+                        <span class="auth-input-icon">🔒</span>
+                        <input type="password" id="passwordInput" class="auth-input" placeholder="At least 8 characters" minlength="8" required autocomplete="current-password">
+                        <button type="button" class="auth-eye-btn" id="togglePasswordBtn" title="Toggle visibility">👁</button>
+                    </div>
+                </div>
+
+                <!-- Confirm Password (Only visible in Sign Up) -->
+                <div class="auth-form-group" id="confirmPasswordGroup" style="display: none;">
+                    <div class="auth-label-row">
+                        <label class="auth-label" for="confirmPasswordInput">Confirm Password</label>
+                    </div>
+                    <div class="auth-input-wrap">
+                        <span class="auth-input-icon">🔒</span>
+                        <input type="password" id="confirmPasswordInput" class="auth-input" placeholder="Repeat your password" minlength="8" autocomplete="new-password">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="auth-submit-btn" id="submitBtn">
+                    <span id="submitBtnText">Sign In →</span>
+                </button>
+            </form>
+
+            <div class="auth-footer-notice" id="authFooterNotice">
+                Protected by Supabase Auth with Row-Level Security (RLS).<br>
+                All documents are grounded in Qdrant Cloud.
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Supabase JS Client & Auth Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            let mode = "signin"; // "signin" | "signup" | "reset"
+
+            // Clear any lingering rate-limit lockout from sessionStorage
+            sessionStorage.removeItem("rag_auth_failed_attempts");
+            sessionStorage.removeItem("rag_auth_lockout_until");
+
+            const tabSignIn = document.getElementById("tabSignIn");
+            const tabSignUp = document.getElementById("tabSignUp");
+            const confirmGroup = document.getElementById("confirmPasswordGroup");
+            const passwordGroup = document.getElementById("passwordGroup");
+            const submitBtn = document.getElementById("submitBtn");
+            const submitText = document.getElementById("submitBtnText");
+            const authForm = document.getElementById("authForm");
+            const emailInput = document.getElementById("emailInput");
+            const passwordInput = document.getElementById("passwordInput");
+            const confirmInput = document.getElementById("confirmPasswordInput");
+            const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+            const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+            const alertBox = document.getElementById("authAlert");
+            const alertMsg = document.getElementById("alertMessage");
+            const alertIcon = document.getElementById("alertIcon");
+
+            let isSubmitting = false;
+
+            function showAlert(msg, isError = true) {
+                alertBox.className = `auth-alert ${isError ? "error" : "success"} visible`;
+                alertBox.style.display = "flex";
+                alertIcon.textContent = isError ? "⚠️" : "✓";
+                alertMsg.textContent = msg;
+            }
+
+            function clearAlert() {
+                alertBox.className = "auth-alert";
+                alertBox.style.display = "none";
+                alertMsg.textContent = "";
+            }
+
+            // Clear any stale alerts when user interacts with inputs
+            emailInput.addEventListener("input", clearAlert);
+            passwordInput.addEventListener("input", clearAlert);
+            confirmInput.addEventListener("input", clearAlert);
+
+            function setMode(newMode) {
+                mode = newMode;
+                clearAlert();
+                if (mode === "signin") {
+                    tabSignIn.classList.add("active");
+                    tabSignUp.classList.remove("active");
+                    passwordGroup.style.display = "block";
+                    confirmGroup.style.display = "none";
+                    submitText.textContent = "Sign In →";
+                    forgotPasswordBtn.style.display = "inline";
+                } else if (mode === "signup") {
+                    tabSignUp.classList.add("active");
+                    tabSignIn.classList.remove("active");
+                    passwordGroup.style.display = "block";
+                    confirmGroup.style.display = "block";
+                    submitText.textContent = "Create Account →";
+                    forgotPasswordBtn.style.display = "none";
+                } else if (mode === "reset") {
+                    tabSignIn.classList.remove("active");
+                    tabSignUp.classList.remove("active");
+                    passwordGroup.style.display = "none";
+                    confirmGroup.style.display = "none";
+                    submitText.textContent = "Send Reset Link →";
+                }
+            }
+
+            tabSignIn.onclick = () => setMode("signin");
+            tabSignUp.onclick = () => setMode("signup");
+
+            forgotPasswordBtn.onclick = () => {
+                setMode("reset");
+                showAlert("Enter your email address and click 'Send Reset Link' to receive password recovery instructions.", false);
+            };
+
+            // Password visibility toggle
+            togglePasswordBtn.onclick = () => {
+                const isPassword = passwordInput.type === "password";
+                passwordInput.type = isPassword ? "text" : "password";
+                togglePasswordBtn.textContent = isPassword ? "🔒" : "👁";
+            };
+
+            // Form Submit
+            authForm.onsubmit = async (e) => {
+                e.preventDefault();
+                if (isSubmitting) return;
+                isSubmitting = true;
+                clearAlert();
+
+                const email = emailInput.value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (!email) {
+                    showAlert("Please enter your email address.");
+                    isSubmitting = false;
+                    return;
+                }
+
+                if (!emailRegex.test(email)) {
+                    showAlert("Please enter a valid email address (e.g. name@domain.com).");
+                    isSubmitting = false;
+                    return;
+                }
+
+                // Password reset mode
+                if (mode === "reset") {
+                    submitBtn.disabled = true;
+                    submitText.innerHTML = `<span class="spinner-inline"></span> Sending...`;
+                    try {
+                        await window.authService.resetPassword(email);
+                        showAlert("If an account exists with this email, password reset instructions have been sent.", false);
+                        setTimeout(() => setMode("signin"), 3500);
+                    } catch (err) {
+                        showAlert(err.message || "Failed to send reset link.");
+                    } finally {
+                        isSubmitting = false;
+                        submitBtn.disabled = false;
+                        submitText.textContent = "Send Reset Link →";
+                    }
+                    return;
+                }
+
+                const password = passwordInput.value;
+                if (!password) {
+                    showAlert("Please enter your password.");
+                    isSubmitting = false;
+                    return;
+                }
+
+                if (mode === "signup") {
+                    if (password.length < 8) {
+                        showAlert("Password must be at least 8 characters long.");
+                        isSubmitting = false;
+                        return;
+                    }
+                    const confirmPass = confirmInput.value;
+                    if (password !== confirmPass) {
+                        showAlert("Passwords do not match.");
+                        isSubmitting = false;
+                        return;
+                    }
+                }
+
+                submitBtn.disabled = true;
+                submitText.innerHTML = `<span class="spinner-inline"></span> ${mode === "signin" ? "Signing In..." : "Creating Account..."}`;
+
+                try {
+                    if (mode === "signin") {
+                        await window.authService.signIn(email, password);
+                        showAlert("Signed in successfully! Redirecting...", false);
+                        setTimeout(() => window.location.href = "index.html", 400);
+                    } else {
+                        const result = await window.authService.signUp(email, password);
+
+                        if (result.needsEmailVerification) {
+                            showAlert(`Account created! A confirmation email was sent to ${email}. Please check your inbox and confirm your email before signing in.`, false);
+                            setMode("signin");
+                            isSubmitting = false;
+                            submitBtn.disabled = false;
+                        } else {
+                            showAlert("Account created successfully! Redirecting...", false);
+                            setTimeout(() => window.location.href = "index.html", 500);
+                        }
+                    }
+                } catch (err) {
+                    showAlert(err.message || "Authentication failed. Please verify your credentials.");
+                    isSubmitting = false;
+                    submitBtn.disabled = false;
+                    submitText.textContent = mode === "signin" ? "Sign In →" : "Create Account →";
+                }
+            };
+        });
+    </script>
+</body>
+
+</html>

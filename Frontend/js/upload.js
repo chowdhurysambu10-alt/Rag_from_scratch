@@ -1,7 +1,7 @@
 /**
  * RAG AI - Document Upload & Processing Pipeline Controller
  * Manages drag-and-drop, client-side validation, 5-stage workflow stepper,
- * and direct backend ingestion into ChromaDB.
+ * and direct backend ingestion into Qdrant Cloud.
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -180,7 +180,7 @@ async function handleUploadSubmit() {
         setStepStatus(2, "completed", "Text extracted");
         setStepStatus(3, "completed", `${response.chunks} chunks generated`);
         setStepStatus(4, "completed", "MiniLM embeddings generated");
-        setStepStatus(5, "completed", "Stored in ChromaDB (rag_documents_v2)");
+        setStepStatus(5, "completed", `Stored in Qdrant Cloud (${response.collection_name || "rag_documents_v2"})`);
 
         // Show Success Result Card
         showSuccess(response);
@@ -288,7 +288,7 @@ function showSuccess(data) {
         successTitle.textContent = `"${data.filename}" is Ready!`;
     }
     if (successDetails) {
-        successDetails.textContent = `Successfully extracted and indexed ${data.chunks} chunks into ChromaDB collection "rag_documents_v2".`;
+        successDetails.textContent = `Successfully extracted and indexed ${data.chunks} chunks into Qdrant Cloud collection "${data.collection_name || "rag_documents_v2"}".`;
     }
     if (chatDocBtn) {
         chatDocBtn.onclick = () => {
