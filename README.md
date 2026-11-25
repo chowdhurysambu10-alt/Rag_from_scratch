@@ -182,6 +182,7 @@ python3 test_rag_synchronization.py
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are always welcome! Feel free to fork the repository and open a Pull Request.
+if you find any issues you cab email 
 
 ---
 
